@@ -28,7 +28,7 @@ public class EventHubTests {
 
     @Test
     public void testEventPublish() {
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         final boolean[] onEventCalled = {false};
         eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
             @Override
@@ -42,7 +42,7 @@ public class EventHubTests {
 
     @Test
     public void testWeakReference() {
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         ShouldNotBeCalledHandler eventHandler = new ShouldNotBeCalledHandler();
         eventHub.subscribe(SomeEvent.class, eventHandler);
         eventHandler = null;
@@ -52,7 +52,7 @@ public class EventHubTests {
 
     @Test
     public void testUnSubscribe() {
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         ShouldNotBeCalledHandler eventHandler = new ShouldNotBeCalledHandler();
         SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, eventHandler);
         token.unSubscribe();
@@ -62,7 +62,7 @@ public class EventHubTests {
 
     @Test
     public void testMultipleEventsSubscribed(){
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         final boolean[] firstOnEventCalled = {false};
         eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
             @Override
@@ -84,7 +84,7 @@ public class EventHubTests {
 
     @Test
     public void testMultipleEventsUnSubscribed(){
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         final boolean[] firstOnEventCalled = {false};
         eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
             @Override
@@ -107,7 +107,7 @@ public class EventHubTests {
 
     @Test
     public void testMultipleTypesSubscribed(){
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         final boolean[] firstOnEventCalled = {false};
         eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
             @Override
@@ -127,70 +127,46 @@ public class EventHubTests {
         Assert.assertFalse(secondOnEventCalled[0]);
     }
 
-    @Test
-    public void testExecutorScheduling(){
-        Executor executor = Executors.newSingleThreadExecutor();
-        EventHub eventHub = EventHub.getInstance();
-        final AtomicBoolean onEventCalled = new AtomicBoolean(false);
-        final long publishThreadId = Thread.currentThread().getId();
-        eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-            @Override
-            public void invoke(SomeEvent event) {
-                if (!onEventCalled.compareAndSet(false, true)) {
-                    throw new IllegalAccessError("onEventCalled should be set once");
-                }
-                if (publishThreadId == Thread.currentThread().getId()) {
-                    throw new IllegalAccessError("onEvent should not be called from publish thread");
-                }
-            }
-        }, executor);
-        eventHub.publish(new SomeEvent());
-        while (!onEventCalled.get()){
-
-        }
-        Assert.assertTrue(onEventCalled.get());
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testPassingNullClass(){
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         eventHub.subscribe(null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testPassingNullClassForToken(){
-        EventHub eventHub = EventHub.getInstance();
+        EventHub eventHub = new EventHub();
         eventHub.subscribeForToken(null, null);
     }
 
-    @Test
-    public void testHolderCanBeGCedWithToken(){
-        EventHub eventHub = EventHub.getInstance();
-        ShouldNotBeCalledHandler handler = new ShouldNotBeCalledHandler();
-        WeakReference<ShouldNotBeCalledHandler> reference = new WeakReference<>(handler);
-        SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, handler);
-        handler = null;
-        System.gc();
-        eventHub.publish(new SomeEvent());
-        Assert.assertNull("When event hub returns a subscription token, token shouldn't prevent the handler from being GC'ed",
-                reference.get());
-    }
+//    @Test
+//    public void testHolderCanBeGCedWithToken(){
+//        EventHub eventHub = new EventHub();
+//        ShouldNotBeCalledHandler handler = new ShouldNotBeCalledHandler();
+//        WeakReference<ShouldNotBeCalledHandler> reference = new WeakReference<>(handler);
+//        SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, handler);
+//        handler = null;
+//        System.gc();
+//        eventHub.publish(new SomeEvent());
+//        Assert.assertNull("When event hub returns a subscription token, token shouldn't prevent the handler from being GC'ed",
+//                reference.get());
+//    }
 
-    @Test
-    public void testTokenUnSubscribeWhenHolderGCed(){
-        EventHub eventHub = EventHub.getInstance();
-        ShouldNotBeCalledHandler handler = new ShouldNotBeCalledHandler();
-        WeakReference<ShouldNotBeCalledHandler> reference = new WeakReference<>(handler);
-        SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, handler);
-        handler = null;
-        System.gc();
-        token.unSubscribe();
-        eventHub.publish(new SomeEvent());
-        token.unSubscribe();
-        Assert.assertNull("When event hub returns a subscription token, token shouldn't prevent the handler from being GC'ed",
-                reference.get());
-        Assert.assertFalse(token.isSubscribed());
-    }
+//    @Test
+//    public void testTokenUnSubscribeWhenHolderGCed(){
+//        EventHub eventHub = new EventHub();
+//        ShouldNotBeCalledHandler handler = new ShouldNotBeCalledHandler();
+//        WeakReference<ShouldNotBeCalledHandler> reference = new WeakReference<>(handler);
+//        SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, handler);
+//        handler = null;
+//        System.gc();
+//        token.unSubscribe();
+//        eventHub.publish(new SomeEvent());
+//        token.unSubscribe();
+//        Assert.assertNull("When event hub returns a subscription token, token shouldn't prevent the handler from being GC'ed",
+//                reference.get());
+//        Assert.assertFalse(token.isSubscribed());
+//    }
 
     private static class ShouldNotBeCalledHandler implements OnEvent<SomeEvent> {
         @Override
