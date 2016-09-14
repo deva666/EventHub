@@ -16,103 +16,133 @@ limitations under the License.
 
 package com.markodevcic.eventhub;
 
-import java.util.*;
+import android.os.Looper;
+import android.support.annotation.Nullable;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
+@SuppressWarnings("unchecked")
 public final class EventHub {
 
-    private final Map<Class<? extends BaseEvent>, Map<String, WeakEventHolder>> classToHoldersMap = new HashMap<>();
+	private final Map<Class<? extends BaseEvent>, Map<String, Subscription>> classToSubsMap = new HashMap<>();
 
-    private EventHub() {
-    }
+	EventHub() {
+	}
 
-    public <T extends BaseEvent> void subscribe(Class<T> eventClass, OnEvent<T> onEvent) {
-        subscribe(eventClass, onEvent, null);
-    }
+	public static EventHub getInstance() {
+		return InstanceHolder.INSTANCE;
+	}
 
-    public <T extends BaseEvent> void subscribe(Class<T> eventClass, OnEvent<T> onEvent, Executor executor) {
-        Ensure.notNull(eventClass, "eventClass");
-        synchronized (classToHoldersMap) {
-            WeakEventHolder eventHolder = new WeakEventHolder(onEvent, executor);
-            subscribeInternal(eventClass, eventHolder);
-        }
-    }
+	public <T extends BaseEvent> void subscribe(Class<T> eventClass, OnEvent<T> onEvent) {
 
-    private <T extends BaseEvent> void subscribeInternal(Class<T> eventClass, WeakEventHolder eventHolder) {
-        if (classToHoldersMap.containsKey(eventClass)) {
-            Map<String, WeakEventHolder> handlers = classToHoldersMap.get(eventClass);
-            handlers.put(eventHolder.id, eventHolder);
-        } else {
-            Map<String, WeakEventHolder> holderMap = new HashMap<>();
-            holderMap.put(eventHolder.id, eventHolder);
-            classToHoldersMap.put(eventClass, holderMap);
-        }
-    }
+		subscribe(eventClass, onEvent, PublicationMode.CALLING_THREAD);
+	}
 
-    public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass, OnEvent<T> onEvent) {
-        return subscribeForToken(eventClass, onEvent, null);
-    }
+	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
+												OnEvent<T> onEvent,
+												PublicationMode publicationMode) {
 
-    public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass, OnEvent<T> onEvent, Executor executor) {
-        Ensure.notNull(eventClass, "eventClass");
-        synchronized (classToHoldersMap) {
-            WeakEventHolder eventHolder = new WeakEventHolder(onEvent, executor);
-            subscribeInternal(eventClass, eventHolder);
-            Action1<SubscriptionToken> onUnSubscribe = getTokenUnSubscribeAction();
-            return new SubscriptionToken(eventClass, eventHolder.id, onUnSubscribe);
-        }
-    }
+			subscribe(eventClass, onEvent, publicationMode, null);
+	}
 
-    private Action1<SubscriptionToken> getTokenUnSubscribeAction() {
-        return new Action1<SubscriptionToken>() {
-            @Override
-            public void invoke(SubscriptionToken subscriptionToken) {
-                synchronized (classToHoldersMap) {
-                    Map<String, WeakEventHolder> eventHolderMap = classToHoldersMap.get(subscriptionToken.getEventClass());
-                    if (eventHolderMap != null && eventHolderMap.containsKey(subscriptionToken.getHolderId())) {
-                        eventHolderMap.remove(subscriptionToken.getHolderId());
-                    }
-                }
-            }
-        };
-    }
+	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
+												OnEvent<T> onEvent,
+												PublicationMode publicationMode,
+												@Nullable Predicate predicate) {
 
-    public <T extends BaseEvent> void publish(final T event) {
-        Ensure.notNull(event, "event");
-        synchronized (classToHoldersMap) {
-            Map<String, WeakEventHolder> eventHolders = classToHoldersMap.get(event.getClass());
-            if (eventHolders != null) {
-                for (Iterator<Map.Entry<String, WeakEventHolder>> it = eventHolders.entrySet().iterator(); it.hasNext(); ) {
-                    WeakEventHolder eventHolder = it.next().getValue();
-                    final OnEvent<T> onEvent = (OnEvent<T>) eventHolder.reference.get();
-                    if (onEvent != null) {
-                        invokeOnEvent(event, eventHolder, onEvent);
-                    } else {
-                        it.remove();
-                    }
-                }
-            }
-        }
-    }
+		Ensure.notNull(eventClass, "eventClass");
+		synchronized (classToSubsMap) {
+			Subscription subscription = new WeakSubscription(onEvent, publicationMode, predicate);
+			subscribeInternal(eventClass, subscription);
+		}
+	}
 
-    private static <T extends BaseEvent> void invokeOnEvent(final T event, WeakEventHolder eventHolder, final OnEvent<T> onEvent) {
-        if (eventHolder.executor != null) {
-            eventHolder.executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    onEvent.invoke(event);
-                }
-            });
-        } else {
-            onEvent.invoke(event);
-        }
-    }
+	private <T extends BaseEvent> void subscribeInternal(Class<T> eventClass, Subscription subscription) {
+		synchronized (classToSubsMap) {
+			if (classToSubsMap.containsKey(eventClass)) {
+				Map<String, Subscription> subscriptionMap = classToSubsMap.get(eventClass);
+				subscriptionMap.put(subscription.id, subscription);
+			} else {
+				Map<String, Subscription> subscriptionMap = new HashMap<>();
+				subscriptionMap.put(subscription.id, subscription);
+				classToSubsMap.put(eventClass, subscriptionMap);
+			}
+		}
+	}
 
-    private static class InstanceHolder {
-        private static final EventHub INSTANCE = new EventHub();
-    }
+	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass, OnEvent<T> onEvent) {
+		return subscribeForToken(eventClass, onEvent, PublicationMode.CALLING_THREAD, null);
+	}
 
-    public static EventHub getInstance() {
-        return InstanceHolder.INSTANCE;
-    }
+	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
+																	 OnEvent<T> onEvent,
+																	 PublicationMode publicationMode) {
+
+		return subscribeForToken(eventClass, onEvent, publicationMode, null);
+	}
+
+	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
+																	 OnEvent<T> onEvent,
+																	 PublicationMode publicationMode,
+																	 Predicate predicate) {
+		Ensure.notNull(eventClass, "eventClass");
+		synchronized (classToSubsMap) {
+			Subscription subscription = new TokenSubscription(onEvent, publicationMode, predicate);
+			subscribeInternal(eventClass, subscription);
+			Action1<SubscriptionToken> onUnSubscribe = getTokenUnSubscribeAction();
+			return new SubscriptionToken(eventClass, subscription.id, onUnSubscribe);
+		}
+	}
+
+	private Action1<SubscriptionToken> getTokenUnSubscribeAction() {
+		return new Action1<SubscriptionToken>() {
+			@Override
+			public void invoke(SubscriptionToken subscriptionToken) {
+				synchronized (classToSubsMap) {
+					Map<String, Subscription> subscriptionMap = classToSubsMap.get(subscriptionToken.getEventClass());
+					if (subscriptionMap != null && subscriptionMap.containsKey(subscriptionToken.getHolderId())) {
+						subscriptionMap.remove(subscriptionToken.getHolderId());
+					}
+				}
+			}
+		};
+	}
+
+	public <T extends BaseEvent> void publish(final T event) {
+		Ensure.notNull(event, "event");
+		synchronized (classToSubsMap) {
+			Map<String, Subscription> subscriptionMap = classToSubsMap.get(event.getClass());
+			if (subscriptionMap != null) {
+				for (Iterator<Map.Entry<String, Subscription>> it = subscriptionMap.entrySet().iterator(); it.hasNext(); ) {
+					Subscription subscription = it.next().getValue();
+					final OnEvent<T> onEvent = (OnEvent<T>)subscription.getNotifyAction();
+					if (onEvent != null && subscription.canNotify()) {
+						executeOnEvent(onEvent, event, subscription.publicationMode);
+					} else {
+						it.remove();
+					}
+				}
+			}
+		}
+	}
+
+	private <T extends BaseEvent> void executeOnEvent(OnEvent<T> onEvent, T event, PublicationMode publicationMode) {
+		switch (publicationMode) {
+			case MAIN_THREAD:
+
+				break;
+			case BACKGROUND_THREAD:
+				break;
+			case CALLING_THREAD:
+				onEvent.invoke(event);
+				break;
+		}
+	}
+
+	private static class InstanceHolder {
+		private static final EventHub INSTANCE = new EventHub();
+	}
 }
