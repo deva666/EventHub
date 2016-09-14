@@ -24,4 +24,12 @@ package com.markodevcic.eventhub;
             throw new IllegalArgumentException("argument: " + argumentName + " can't be null");
         }
     }
+
+	/*package*/ static void notNull(Object... arguments) {
+		for (Object argument : arguments) {
+			if (argument == null) {
+				throw new IllegalArgumentException("argument can not be null");
+			}
+		}
+	}
 }
