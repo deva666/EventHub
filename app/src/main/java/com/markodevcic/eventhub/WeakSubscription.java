@@ -7,22 +7,10 @@ import java.lang.ref.WeakReference;
 /*package*/  class WeakSubscription extends Subscription {
 
 	private final WeakReference<OnEvent<? extends BaseEvent>> eventWeakReference;
-	private final WeakReference<Predicate> predicateReference;
 
 	/*package*/ WeakSubscription(OnEvent<? extends BaseEvent> onEvent, PublicationMode publicationMode, Predicate predicate) {
-		super(publicationMode);
+		super(publicationMode, predicate);
 		eventWeakReference = new WeakReference<OnEvent<? extends BaseEvent>>(onEvent);
-		this.predicateReference = new WeakReference<>(predicate);
-	}
-
-	@Override
-	/*package*/ boolean canNotify() {
-		Predicate predicate = predicateReference.get();
-		if (predicate == null) {
-			return true;
-		} else {
-			return predicate.invoke();
-		}
 	}
 
 	@Nullable

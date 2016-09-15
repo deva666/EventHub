@@ -16,13 +16,11 @@ limitations under the License.
 
 package com.markodevcic.eventhub;
 
-import android.os.Looper;
 import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Executor;
 
 @SuppressWarnings("unchecked")
 public final class EventHub {
