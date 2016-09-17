@@ -27,23 +27,29 @@ public final class EventHub {
 
 	private final Map<Class<? extends BaseEvent>, Map<String, Subscription>> classToSubsMap = new HashMap<>();
 
-	EventHub() {
+	private PublicationMode defaultPublicationMode = PublicationMode.MAIN_THREAD;
+
+	public EventHub() {
 	}
 
-	public static EventHub getInstance() {
+	public EventHub(PublicationMode publicationMode) {
+		defaultPublicationMode = publicationMode;
+	}
+
+	public static EventHub getDefault() {
 		return InstanceHolder.INSTANCE;
 	}
 
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass, OnEvent<T> onEvent) {
 
-		subscribe(eventClass, onEvent, PublicationMode.CALLING_THREAD);
+		subscribe(eventClass, onEvent, defaultPublicationMode);
 	}
 
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
 												OnEvent<T> onEvent,
 												PublicationMode publicationMode) {
 
-			subscribe(eventClass, onEvent, publicationMode, null);
+		subscribe(eventClass, onEvent, publicationMode, null);
 	}
 
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
@@ -52,10 +58,8 @@ public final class EventHub {
 												@Nullable Predicate predicate) {
 
 		Ensure.notNull(eventClass, "eventClass");
-		synchronized (classToSubsMap) {
-			Subscription subscription = new WeakSubscription(onEvent, publicationMode, predicate);
-			subscribeInternal(eventClass, subscription);
-		}
+		Subscription subscription = new WeakSubscription(onEvent, publicationMode, predicate);
+		subscribeInternal(eventClass, subscription);
 	}
 
 	private <T extends BaseEvent> void subscribeInternal(Class<T> eventClass, Subscription subscription) {
@@ -72,7 +76,7 @@ public final class EventHub {
 	}
 
 	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass, OnEvent<T> onEvent) {
-		return subscribeForToken(eventClass, onEvent, PublicationMode.CALLING_THREAD, null);
+		return subscribeForToken(eventClass, onEvent, defaultPublicationMode, null);
 	}
 
 	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
@@ -87,12 +91,10 @@ public final class EventHub {
 																	 PublicationMode publicationMode,
 																	 Predicate predicate) {
 		Ensure.notNull(eventClass, "eventClass");
-		synchronized (classToSubsMap) {
-			Subscription subscription = new TokenSubscription(onEvent, publicationMode, predicate);
-			subscribeInternal(eventClass, subscription);
-			Action1<SubscriptionToken> onUnSubscribe = getTokenUnSubscribeAction();
-			return new SubscriptionToken(eventClass, subscription.id, onUnSubscribe);
-		}
+		Subscription subscription = new TokenSubscription(onEvent, publicationMode, predicate);
+		subscribeInternal(eventClass, subscription);
+		Action1<SubscriptionToken> onUnSubscribe = getTokenUnSubscribeAction();
+		return new SubscriptionToken(eventClass, subscription.id, onUnSubscribe);
 	}
 
 	private Action1<SubscriptionToken> getTokenUnSubscribeAction() {
@@ -116,7 +118,7 @@ public final class EventHub {
 			if (subscriptionMap != null) {
 				for (Iterator<Map.Entry<String, Subscription>> it = subscriptionMap.entrySet().iterator(); it.hasNext(); ) {
 					Subscription subscription = it.next().getValue();
-					final OnEvent<T> onEvent = (OnEvent<T>)subscription.getNotifyAction();
+					final OnEvent<T> onEvent = (OnEvent<T>) subscription.getNotifyAction();
 					if (onEvent != null && subscription.canNotify()) {
 						executeOnEvent(onEvent, event, subscription.publicationMode);
 					} else {

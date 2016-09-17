@@ -11,7 +11,7 @@ import java.util.UUID;
 	/*package*/ final PublicationMode publicationMode;
 	private final WeakReference<Predicate> predicateReference;
 
-	/*package*/ Subscription(PublicationMode publicationMode, Predicate predicate) {
+	/*package*/ Subscription(PublicationMode publicationMode, @Nullable Predicate predicate) {
 		this.id = UUID.randomUUID().toString();
 		this.publicationMode = publicationMode;
 		predicateReference = new WeakReference<>(predicate);
@@ -19,11 +19,7 @@ import java.util.UUID;
 
 	/*package*/ boolean canNotify() {
 		Predicate predicate = predicateReference.get();
-		if (predicate == null) {
-			return true;
-		} else {
-			return predicate.invoke();
-		}
+		return predicate == null || predicate.invoke();
 	}
 
 	@Nullable
