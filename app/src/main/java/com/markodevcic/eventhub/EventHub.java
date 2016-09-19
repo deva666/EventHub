@@ -134,8 +134,10 @@ public final class EventHub {
 				for (Iterator<Map.Entry<String, Subscription>> it = subscriptionMap.entrySet().iterator(); it.hasNext(); ) {
 					Subscription subscription = it.next().getValue();
 					final OnEvent<T> onEvent = (OnEvent<T>) subscription.getNotifyAction();
-					if (onEvent != null && subscription.canNotify()) {
-						executeOnEvent(onEvent, event, subscription.publicationMode);
+					if (onEvent != null) {
+						if (subscription.canNotify()) {
+							executeOnEvent(onEvent, event, subscription.publicationMode);
+						}
 					} else {
 						it.remove();
 					}
