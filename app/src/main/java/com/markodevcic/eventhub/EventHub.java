@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.markodevcic.eventhub;
 
+import android.os.Looper;
 import android.support.annotation.Nullable;
 
 import java.util.HashMap;
@@ -29,16 +30,12 @@ public final class EventHub {
 
 	private PublicationMode defaultPublicationMode = PublicationMode.MAIN_THREAD;
 
-	public EventHub() {
-	}
+	public EventHub() {}
 
 	public EventHub(PublicationMode publicationMode) {
 		defaultPublicationMode = publicationMode;
 	}
 
-	public static EventHub getDefault() {
-		return InstanceHolder.INSTANCE;
-	}
 
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass, OnEvent<T> onEvent) {
 
@@ -129,20 +126,31 @@ public final class EventHub {
 		}
 	}
 
-	private <T extends BaseEvent> void executeOnEvent(OnEvent<T> onEvent, T event, PublicationMode publicationMode) {
+	private <T extends BaseEvent> void executeOnEvent(final OnEvent<T> onEvent, final T event, PublicationMode publicationMode) {
 		switch (publicationMode) {
 			case MAIN_THREAD:
-
+				if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+					onEvent.invoke(event);
+				} else {
+					MainThreadScheduler.schedule(new Runnable() {
+						@Override
+						public void run() {
+							onEvent.invoke(event);
+						}
+					});
+				}
 				break;
 			case BACKGROUND_THREAD:
+				BackgroundThreadScheduler.schedule(new Runnable() {
+					@Override
+					public void run() {
+						onEvent.invoke(event);
+					}
+				});
 				break;
 			case CALLING_THREAD:
 				onEvent.invoke(event);
 				break;
 		}
-	}
-
-	private static class InstanceHolder {
-		private static final EventHub INSTANCE = new EventHub();
 	}
 }
