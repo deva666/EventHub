@@ -7,10 +7,8 @@ import android.os.Looper;
 
 	private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-	private MainThreadScheduler() {
-	}
+	private MainThreadScheduler() {}
 
-	/*package*/
 	static void schedule(Runnable runnable) {
 		mainHandler.post(runnable);
 	}

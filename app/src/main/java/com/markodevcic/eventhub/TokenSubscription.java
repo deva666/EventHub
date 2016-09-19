@@ -2,7 +2,7 @@ package com.markodevcic.eventhub;
 
 import android.support.annotation.Nullable;
 
- class TokenSubscription extends Subscription {
+ /*package*/ class TokenSubscription extends Subscription {
 
 	private final OnEvent<? extends BaseEvent> onEvent;
 

@@ -139,34 +139,43 @@ public class EventHubTests {
         eventHub.subscribeForToken(null, null);
     }
 
-//    @Test
-//    public void testHolderCanBeGCedWithToken(){
-//        EventHub eventHub = new EventHub();
-//        ShouldNotBeCalledHandler handler = new ShouldNotBeCalledHandler();
-//        WeakReference<ShouldNotBeCalledHandler> reference = new WeakReference<>(handler);
-//        SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, handler);
-//        handler = null;
-//        System.gc();
-//        eventHub.publish(new SomeEvent());
-//        Assert.assertNull("When event hub returns a subscription token, token shouldn't prevent the handler from being GC'ed",
-//                reference.get());
-//    }
+	@Test
+	public void testBackgroundPublicationMode() throws InterruptedException {
+		EventHub eventHub = new EventHub(PublicationMode.BACKGROUND_THREAD);
+		final boolean[] onEventCalled = {false};
+		final Thread callingThread = Thread.currentThread();
+		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
+			@Override
+			public void invoke(SomeEvent event) {
+				Assert.assertNotEquals(callingThread, Thread.currentThread());
+				onEventCalled[0] = true;
+			}
+		});
+		eventHub.publish(new SomeEvent());
+		while (!onEventCalled[0]) {
+			Thread.sleep(1);
+		}
+		Assert.assertTrue(onEventCalled[0]);
+	}
 
-//    @Test
-//    public void testTokenUnSubscribeWhenHolderGCed(){
-//        EventHub eventHub = new EventHub();
-//        ShouldNotBeCalledHandler handler = new ShouldNotBeCalledHandler();
-//        WeakReference<ShouldNotBeCalledHandler> reference = new WeakReference<>(handler);
-//        SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, handler);
-//        handler = null;
-//        System.gc();
-//        token.unSubscribe();
-//        eventHub.publish(new SomeEvent());
-//        token.unSubscribe();
-//        Assert.assertNull("When event hub returns a subscription token, token shouldn't prevent the handler from being GC'ed",
-//                reference.get());
-//        Assert.assertFalse(token.isSubscribed());
-//    }
+	@Test
+	public void testBackgroundPublicationModeWithToken() throws InterruptedException {
+		EventHub eventHub = new EventHub(PublicationMode.BACKGROUND_THREAD);
+		final boolean[] onEventCalled = {false};
+		final Thread callingThread = Thread.currentThread();
+		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, new OnEvent<SomeEvent>() {
+			@Override
+			public void invoke(SomeEvent event) {
+				Assert.assertNotEquals(callingThread, Thread.currentThread());
+				onEventCalled[0] = true;
+			}
+		});
+		eventHub.publish(new SomeEvent());
+		while (!onEventCalled[0]) {
+			Thread.sleep(1);
+		}
+		Assert.assertTrue(onEventCalled[0]);
+	}
 
     private static class ShouldNotBeCalledHandler implements OnEvent<SomeEvent> {
         @Override

@@ -25,7 +25,7 @@ package com.markodevcic.eventhub;
         }
     }
 
-	/*package*/ static void notNull(Object... arguments) {
+	/*package*/ static void notNull(Object[] arguments, String[] names) {
 		for (Object argument : arguments) {
 			if (argument == null) {
 				throw new IllegalArgumentException("argument can not be null");

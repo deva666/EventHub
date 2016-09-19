@@ -7,8 +7,10 @@ import java.util.concurrent.Executors;
 
 	private static final Executor executor = Executors.newSingleThreadExecutor();
 
-	/*package*/
+	private BackgroundThreadScheduler() {}
+
 	static void schedule(Runnable runnable) {
 		executor.execute(runnable);
+
 	}
 }
