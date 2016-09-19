@@ -177,6 +177,25 @@ public class EventHubTests {
 		Assert.assertTrue(onEventCalled[0]);
 	}
 
+	@Test
+	public void testPredicate() {
+		EventHub eventHub = new EventHub();
+		final boolean[] onEventCalled = {false};
+		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
+			@Override
+			public void invoke(SomeEvent event) {
+				onEventCalled[0] = true;
+			}
+		}, PublicationMode.CALLING_THREAD, new Predicate() {
+			@Override
+			public boolean invoke() {
+				return false;
+			}
+		});
+		eventHub.publish(new SomeEvent());
+		Assert.assertFalse(onEventCalled[0]);
+	}
+
     private static class ShouldNotBeCalledHandler implements OnEvent<SomeEvent> {
         @Override
         public void invoke(SomeEvent event) {

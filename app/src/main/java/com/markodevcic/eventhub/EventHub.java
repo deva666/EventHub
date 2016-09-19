@@ -51,10 +51,19 @@ public final class EventHub {
 
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
 												OnEvent<T> onEvent,
+												Predicate predicate) {
+
+		subscribe(eventClass, onEvent, defaultPublicationMode, predicate);
+	}
+
+	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
+												OnEvent<T> onEvent,
 												PublicationMode publicationMode,
 												@Nullable Predicate predicate) {
 
 		Ensure.notNull(eventClass, "eventClass");
+		Ensure.notNull(onEvent, "onEvent");
+		Ensure.notNull(publicationMode, "publicationMode");
 		Subscription subscription = new WeakSubscription(onEvent, publicationMode, predicate);
 		subscribeInternal(eventClass, subscription);
 	}
@@ -85,9 +94,18 @@ public final class EventHub {
 
 	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
 																	 OnEvent<T> onEvent,
+																	 Predicate predicate) {
+
+		return subscribeForToken(eventClass, onEvent, defaultPublicationMode, predicate);
+	}
+
+	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
+																	 OnEvent<T> onEvent,
 																	 PublicationMode publicationMode,
 																	 Predicate predicate) {
 		Ensure.notNull(eventClass, "eventClass");
+		Ensure.notNull(onEvent, "onEvent");
+		Ensure.notNull(publicationMode, "publicationMode");
 		Subscription subscription = new TokenSubscription(onEvent, publicationMode, predicate);
 		subscribeInternal(eventClass, subscription);
 		Action1<SubscriptionToken> onUnSubscribe = getTokenUnSubscribeAction();
