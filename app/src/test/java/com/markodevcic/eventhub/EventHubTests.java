@@ -198,6 +198,12 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] onEventCalled = {false};
 		final boolean[] canEventBeCalled = {false};
+		eventHub.subscribeForToken(SomeEvent.class, new OnEvent<SomeEvent>() {
+			@Override
+			public void invoke(SomeEvent event) {
+
+			}
+		});
 		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, new OnEvent<SomeEvent>() {
 					@Override
 					public void invoke(SomeEvent event) {
