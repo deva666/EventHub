@@ -25,12 +25,7 @@ public class EventHubTests {
 	public void testEventPublish() {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] onEventCalled = {false};
-		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				onEventCalled[0] = true;
-			}
-		});
+		eventHub.subscribe(SomeEvent.class, event -> onEventCalled[0] = true);
 		eventHub.publish(new SomeEvent());
 		Assert.assertTrue(onEventCalled[0]);
 	}
@@ -59,19 +54,9 @@ public class EventHubTests {
 	public void testMultipleEventsSubscribed() {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] firstOnEventCalled = {false};
-		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				firstOnEventCalled[0] = true;
-			}
-		});
+		eventHub.subscribe(SomeEvent.class, event -> firstOnEventCalled[0] = true);
 		final boolean[] secondOnEventCalled = {false};
-		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				secondOnEventCalled[0] = true;
-			}
-		});
+		eventHub.subscribe(SomeEvent.class, event -> secondOnEventCalled[0] = true);
 		eventHub.publish(new SomeEvent());
 		Assert.assertTrue(firstOnEventCalled[0]);
 		Assert.assertTrue(secondOnEventCalled[0]);
@@ -81,19 +66,9 @@ public class EventHubTests {
 	public void testMultipleEventsUnSubscribed() {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] firstOnEventCalled = {false};
-		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				firstOnEventCalled[0] = true;
-			}
-		});
+		eventHub.subscribe(SomeEvent.class, event -> firstOnEventCalled[0] = true);
 		final boolean[] secondOnEventCalled = {false};
-		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				secondOnEventCalled[0] = true;
-			}
-		});
+		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> secondOnEventCalled[0] = true);
 		token.unSubscribe();
 		eventHub.publish(new SomeEvent());
 		Assert.assertTrue(firstOnEventCalled[0]);
@@ -104,19 +79,9 @@ public class EventHubTests {
 	public void testMultipleTypesSubscribed() {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] firstOnEventCalled = {false};
-		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				firstOnEventCalled[0] = true;
-			}
-		});
+		eventHub.subscribe(SomeEvent.class, event -> firstOnEventCalled[0] = true);
 		final boolean[] secondOnEventCalled = {false};
-		eventHub.subscribe(AnotherEvent.class, new OnEvent<AnotherEvent>() {
-			@Override
-			public void invoke(AnotherEvent event) {
-				secondOnEventCalled[0] = true;
-			}
-		});
+		eventHub.subscribe(AnotherEvent.class, event -> secondOnEventCalled[0] = true);
 		eventHub.publish(new SomeEvent());
 		Assert.assertTrue(firstOnEventCalled[0]);
 		Assert.assertFalse(secondOnEventCalled[0]);
@@ -139,12 +104,9 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.BACKGROUND_THREAD);
 		final boolean[] onEventCalled = {false};
 		final Thread callingThread = Thread.currentThread();
-		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				Assert.assertNotEquals(callingThread, Thread.currentThread());
-				onEventCalled[0] = true;
-			}
+		eventHub.subscribe(SomeEvent.class, event -> {
+			Assert.assertNotEquals(callingThread, Thread.currentThread());
+			onEventCalled[0] = true;
 		});
 		eventHub.publish(new SomeEvent());
 		while (!onEventCalled[0]) {
@@ -158,12 +120,9 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.BACKGROUND_THREAD);
 		final boolean[] onEventCalled = {false};
 		final Thread callingThread = Thread.currentThread();
-		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
-				Assert.assertNotEquals(callingThread, Thread.currentThread());
-				onEventCalled[0] = true;
-			}
+		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> {
+			Assert.assertNotEquals(callingThread, Thread.currentThread());
+			onEventCalled[0] = true;
 		});
 		eventHub.publish(new SomeEvent());
 		while (!onEventCalled[0]) {
@@ -176,19 +135,9 @@ public class EventHubTests {
 	public void testPredicate() {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] onEventCalled = {false};
-		eventHub.subscribe(SomeEvent.class, new OnEvent<SomeEvent>() {
-					@Override
-					public void invoke(SomeEvent event) {
-						onEventCalled[0] = true;
-					}
-				},
+		eventHub.subscribe(SomeEvent.class, event -> onEventCalled[0] = true,
 				PublicationMode.CALLING_THREAD,
-				new Predicate() {
-					@Override
-					public boolean invoke() {
-						return false;
-					}
-				});
+				() -> false);
 		eventHub.publish(new SomeEvent());
 		Assert.assertFalse(onEventCalled[0]);
 	}
@@ -198,25 +147,12 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] onEventCalled = {false};
 		final boolean[] canEventBeCalled = {false};
-		eventHub.subscribeForToken(SomeEvent.class, new OnEvent<SomeEvent>() {
-			@Override
-			public void invoke(SomeEvent event) {
+		eventHub.subscribeForToken(SomeEvent.class, event -> {
 
-			}
 		});
-		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, new OnEvent<SomeEvent>() {
-					@Override
-					public void invoke(SomeEvent event) {
-						onEventCalled[0] = true;
-					}
-				},
+		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> onEventCalled[0] = true,
 				PublicationMode.CALLING_THREAD,
-				new Predicate() {
-					@Override
-					public boolean invoke() {
-						return canEventBeCalled[0];
-					}
-				});
+				() -> canEventBeCalled[0]);
 		eventHub.publish(new SomeEvent());
 		Assert.assertFalse(onEventCalled[0]);
 		canEventBeCalled[0] = true;
