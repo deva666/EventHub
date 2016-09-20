@@ -100,6 +100,7 @@ public final class EventHub {
 		subscribeInternal(eventClass, subscription);
 	}
 
+
 	private <T extends BaseEvent> void subscribeInternal(Class<T> eventClass, Subscription subscription) {
 		synchronized (classToSubsMap) {
 			if (classToSubsMap.containsKey(eventClass)) {
@@ -225,7 +226,7 @@ public final class EventHub {
 			}
 		}
 	}
-	
+
 
 	private <T extends BaseEvent> void executeOnEvent(final OnEvent<T> onEvent, final T event, PublicationMode publicationMode) {
 		switch (publicationMode) {

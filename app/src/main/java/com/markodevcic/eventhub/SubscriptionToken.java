@@ -40,6 +40,11 @@ public final class SubscriptionToken {
         }
     }
 
+
+	/***
+	 *
+	 * @return a value indicating if the subscription is active
+	 */
     public boolean isSubscribed() {
         return isSubscribed.get();
     }
