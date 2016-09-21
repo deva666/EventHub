@@ -44,7 +44,7 @@ public class EventHubTests {
 	public void testUnSubscribe() {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		ShouldNotBeCalledHandler eventHandler = new ShouldNotBeCalledHandler();
-		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, eventHandler);
+		Token token = eventHub.subscribeForToken(SomeEvent.class, eventHandler);
 		token.unSubscribe();
 		eventHub.publish(new SomeEvent());
 		Assert.assertFalse(token.isSubscribed());
@@ -68,7 +68,7 @@ public class EventHubTests {
 		final boolean[] firstOnEventCalled = {false};
 		eventHub.subscribe(SomeEvent.class, event -> firstOnEventCalled[0] = true);
 		final boolean[] secondOnEventCalled = {false};
-		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> secondOnEventCalled[0] = true);
+		Token token = eventHub.subscribeForToken(SomeEvent.class, event -> secondOnEventCalled[0] = true);
 		token.unSubscribe();
 		eventHub.publish(new SomeEvent());
 		Assert.assertTrue(firstOnEventCalled[0]);
@@ -120,7 +120,7 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.BACKGROUND_THREAD);
 		final boolean[] onEventCalled = {false};
 		final Thread callingThread = Thread.currentThread();
-		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> {
+		Token token = eventHub.subscribeForToken(SomeEvent.class, event -> {
 			Assert.assertNotEquals(callingThread, Thread.currentThread());
 			onEventCalled[0] = true;
 		});
@@ -146,7 +146,7 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] onEventCalled = {false};
 		final boolean[] canEventBeCalled = {false};
-		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> onEventCalled[0] = true,
+		Token token = eventHub.subscribeForToken(SomeEvent.class, event -> onEventCalled[0] = true,
 				() -> canEventBeCalled[0]);
 		eventHub.publish(new SomeEvent());
 		Assert.assertFalse(onEventCalled[0]);
@@ -163,11 +163,4 @@ public class EventHubTests {
 	}
 
 
-	private static class SomeEvent extends BaseEvent {
-
-	}
-
-	private static class AnotherEvent extends BaseEvent {
-
-	}
 }

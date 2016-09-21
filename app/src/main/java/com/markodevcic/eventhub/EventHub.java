@@ -120,12 +120,12 @@ public final class EventHub {
 	 * Uses {@link PublicationMode} passed to EventHub constructor.
 	 * When default constructor is used then uses {@code PublicationMode.MAIN_THREAD}.
 	 * Subscription will hold a strong reference to onEvent action.
-	 * To avoid memory leaks, unSubscribe method must be called on the {@link SubscriptionToken} when subscriber is done.
+	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
 	 * @param eventClass type of event to listen for publications
 	 * @param onEvent action to be invoked on event publish
-	 * @return {@link SubscriptionToken} which can be used to un-subscribe from notifications
+	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
-	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass, OnEvent<T> onEvent) {
+	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass, OnEvent<T> onEvent) {
 		return subscribeForToken(eventClass, onEvent, defaultPublicationMode, null);
 	}
 
@@ -133,13 +133,13 @@ public final class EventHub {
 	/***
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription will hold a strong reference to onEvent action.
-	 * To avoid memory leaks, unSubscribe method must be called on the {@link SubscriptionToken} when subscriber is done.
+	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
 	 * @param eventClass type of event to listen for publications
 	 * @param onEvent action to be invoked on event publish
 	 * @param publicationMode where to schedule the event publish
-	 * @return {@link SubscriptionToken} which can be used to un-subscribe from notifications
+	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
-	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
+	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass,
 																	 OnEvent<T> onEvent,
 																	 PublicationMode publicationMode) {
 
@@ -150,13 +150,13 @@ public final class EventHub {
 	/***
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription will hold a strong reference to onEvent action.
-	 * To avoid memory leaks, unSubscribe method must be called on the {@link SubscriptionToken} when subscriber is done.
+	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
 	 * @param eventClass type of event to listen for publications
 	 * @param onEvent action to be invoked on event publish
 	 * @param predicate predicate that will be invoked to check if the event can be published for this subscription
-	 * @return {@link SubscriptionToken} which can be used to un-subscribe from notifications
+	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
-	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
+	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass,
 																	 OnEvent<T> onEvent,
 																	 Predicate predicate) {
 
@@ -169,14 +169,14 @@ public final class EventHub {
 	 * Uses {@link PublicationMode} passed to EventHub constructor.
 	 * When default constructor is used then uses {@code PublicationMode.MAIN_THREAD}.
 	 * Subscription will hold a strong reference to onEvent action.
-	 * To avoid memory leaks, unSubscribe method must be called on the {@link SubscriptionToken} when subscriber is done.
+	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
 	 * @param eventClass type of event to listen for publications
 	 * @param onEvent action to be invoked on event publish
 	 * @param publicationMode where to schedule the event publish
 	 * @param predicate predicate that will be invoked to check if the event can be published for this subscription
-	 * @return {@link SubscriptionToken} which can be used to un-subscribe from notifications
+	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
-	public <T extends BaseEvent> SubscriptionToken subscribeForToken(Class<T> eventClass,
+	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass,
 																	 OnEvent<T> onEvent,
 																	 PublicationMode publicationMode,
 																	 @Nullable Predicate predicate) {
