@@ -7,13 +7,25 @@
 * no need to unsubscribe (no memory leaks)
 
 ---------------
-### Example: ###
+### Examples: ###
+
+*Subscribe with weak subscription, internally EventHub stores a weak reference to the subscriber.*
 
 ```java
 EventHub eventHub = new EventHub();
 eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published");
 eventHub.publish(new SomeEvent());
 ```
+
+*You can also subscribe for token, then you control the lifetime of the subscription.*
+
+```java
+EventHub eventHub = new EventHub();
+Token token = eventHub.subscribeForToken(SomeEvent.class, event -> Log.d("event", "this won't be called");
+token.unSubscribe();
+eventHub.publish(new SomeEvent());
+```
+
 ------------
 
 Written by [Marko Devcic](http://www.markodevcic.com)
