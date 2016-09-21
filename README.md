@@ -10,7 +10,9 @@
 ### Example: ###
 
 ```java
-
+EventHub eventHub = new EventHub();
+eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published");
+eventHub.publish(new SomeEvent());
 ```
 ------------
 
