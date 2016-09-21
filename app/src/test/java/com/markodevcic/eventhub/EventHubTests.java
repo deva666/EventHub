@@ -146,9 +146,6 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] onEventCalled = {false};
 		final boolean[] canEventBeCalled = {false};
-		eventHub.subscribeForToken(SomeEvent.class, event -> {
-
-		});
 		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> onEventCalled[0] = true,
 				() -> canEventBeCalled[0]);
 		eventHub.publish(new SomeEvent());
