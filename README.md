@@ -8,20 +8,20 @@
 
 ---------------
 ### Examples: ###
-&nbsp;
+
 
 *Subscribe with weak subscription, internally EventHub stores a weak reference to the subscriber.*
-&nbsp;
+
 
 ```java
 EventHub eventHub = new EventHub();
 eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published"));
 eventHub.publish(new SomeEvent());
 ```
-&nbsp;
+
 
 *You can also subscribe for token, then you control the lifetime of the subscription.*
-&nbsp;
+
 
 ```java
 EventHub eventHub = new EventHub();
@@ -29,18 +29,16 @@ Token token = eventHub.subscribeForToken(SomeEvent.class, event -> Log.d("event"
 token.unSubscribe();
 eventHub.publish(new SomeEvent());
 ```
-&nbsp;
+
 
 *Want to call the subscription on the main thread, background thread or calling thread? Pass the PublicationMode when subscribing.*
-&nbsp;
+
 
 ```java
 EventHub eventHub = new EventHub();
 eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published"), PublicationMode.MAIN_THREAD);
 eventHub.publish(new SomeEvent());
 ```
-&nbsp;
-
 
 
 ------------
