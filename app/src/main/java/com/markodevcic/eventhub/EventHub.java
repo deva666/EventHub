@@ -190,14 +190,11 @@ public final class EventHub {
 	}
 
 	private Action1<SubscriptionToken> getTokenUnSubscribeAction() {
-		return new Action1<SubscriptionToken>() {
-			@Override
-			public void invoke(SubscriptionToken subscriptionToken) {
-				synchronized (classToSubsMap) {
-					Map<String, Subscription> subscriptionMap = classToSubsMap.get(subscriptionToken.getEventClass());
-					if (subscriptionMap != null && subscriptionMap.containsKey(subscriptionToken.getHolderId())) {
-						subscriptionMap.remove(subscriptionToken.getHolderId());
-					}
+		return subscriptionToken -> {
+			synchronized (classToSubsMap) {
+				Map<String, Subscription> subscriptionMap = classToSubsMap.get(subscriptionToken.getEventClass());
+				if (subscriptionMap != null && subscriptionMap.containsKey(subscriptionToken.getHolderId())) {
+					subscriptionMap.remove(subscriptionToken.getHolderId());
 				}
 			}
 		};
@@ -238,21 +235,11 @@ public final class EventHub {
 				if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
 					onEvent.invoke(event);
 				} else {
-					MainThreadScheduler.schedule(new Runnable() {
-						@Override
-						public void run() {
-							onEvent.invoke(event);
-						}
-					});
+					MainThreadScheduler.schedule(() -> onEvent.invoke(event));
 				}
 				break;
 			case BACKGROUND_THREAD:
-				BackgroundThreadScheduler.schedule(new Runnable() {
-					@Override
-					public void run() {
-						onEvent.invoke(event);
-					}
-				});
+				BackgroundThreadScheduler.schedule(() -> onEvent.invoke(event));
 				break;
 			case CALLING_THREAD:
 				onEvent.invoke(event);
