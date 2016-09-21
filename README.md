@@ -18,7 +18,7 @@ EventHub eventHub = new EventHub();
 eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published"));
 eventHub.publish(new SomeEvent());
 ```
-
+---------------
 
 *You can also subscribe for token, then you control the lifetime of the subscription.*
 
@@ -30,7 +30,7 @@ token.unSubscribe();
 eventHub.publish(new SomeEvent());
 ```
 
-
+---------------
 *Want to call the subscription on the main thread, background thread or calling thread? Pass the PublicationMode when subscribing.*
 
 
@@ -39,7 +39,7 @@ EventHub eventHub = new EventHub();
 eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published"), PublicationMode.MAIN_THREAD);
 eventHub.publish(new SomeEvent());
 ```
-
+---------------
 *Have some custom rule whether the subscription can be invoked? Pass it to subscribe method.*
 
 
