@@ -206,10 +206,12 @@ public final class EventHub {
 	/***
 	 * Publishes the event to all subscribers
 	 * @param event payload to be published
+	 * @return value indicating if any subscribers got notified
 	 */
-	public <T extends BaseEvent> void publish(final T event) {
+	public <T extends BaseEvent> boolean publish(final T event) {
 		Ensure.notNull(event, "event");
 		synchronized (classToSubsMap) {
+			boolean hasSubscribers = false;
 			Map<String, Subscription> subscriptionMap = classToSubsMap.get(event.getClass());
 			if (subscriptionMap != null) {
 				for (Iterator<Map.Entry<String, Subscription>> it = subscriptionMap.entrySet().iterator(); it.hasNext(); ) {
@@ -218,12 +220,14 @@ public final class EventHub {
 					if (onEvent != null) {
 						if (subscription.canNotify()) {
 							executeOnEvent(onEvent, event, subscription.publicationMode);
+							hasSubscribers = true;
 						}
 					} else {
 						it.remove();
 					}
 				}
 			}
+			return hasSubscribers;
 		}
 	}
 
