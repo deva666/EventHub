@@ -8,13 +8,13 @@ public final class CompositeToken
 
 	private final List<Token> tokens = new ArrayList<>();
 
-	public synchronized void add(Token token) {
+	public void add(Token token) {
 		if (!tokens.contains(token)) {
 			tokens.add(token);
 		}
 	}
 
-	public synchronized void remove(Token token) {
+	public void remove(Token token) {
 		int position = -1;
 		int size = tokens.size();
 		for (int i = 0; i < size; i++) {
@@ -29,14 +29,14 @@ public final class CompositeToken
 	}
 
 	@Override
-	public synchronized void unSubscribe() {
+	public void unSubscribe() {
 		for (Token token : tokens) {
 			token.unSubscribe();
 		}
 	}
 
 	@Override
-	public synchronized boolean isSubscribed() {
+	public boolean isSubscribed() {
 		for (Token token : tokens) {
 			if (token.isSubscribed()) {
 				return true;
