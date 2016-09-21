@@ -136,7 +136,6 @@ public class EventHubTests {
 		EventHub eventHub = new EventHub(PublicationMode.CALLING_THREAD);
 		final boolean[] onEventCalled = {false};
 		eventHub.subscribe(SomeEvent.class, event -> onEventCalled[0] = true,
-				PublicationMode.CALLING_THREAD,
 				() -> false);
 		eventHub.publish(new SomeEvent());
 		Assert.assertFalse(onEventCalled[0]);
@@ -151,7 +150,6 @@ public class EventHubTests {
 
 		});
 		SubscriptionToken token = eventHub.subscribeForToken(SomeEvent.class, event -> onEventCalled[0] = true,
-				PublicationMode.CALLING_THREAD,
 				() -> canEventBeCalled[0]);
 		eventHub.publish(new SomeEvent());
 		Assert.assertFalse(onEventCalled[0]);
