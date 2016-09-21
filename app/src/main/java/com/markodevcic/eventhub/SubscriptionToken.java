@@ -18,7 +18,8 @@ package com.markodevcic.eventhub;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class SubscriptionToken {
+public final class SubscriptionToken
+        implements Token {
 
     private final Class<? extends BaseEvent> eventClass;
     private final String holderId;
@@ -33,6 +34,10 @@ public final class SubscriptionToken {
         this.onUnSubscribe = onUnSubscribe;
     }
 
+	/***
+     * Stops listening for events
+     */
+    @Override
     public void unSubscribe() {
         if (isSubscribed.compareAndSet(true, false)) {
             onUnSubscribe.invoke(this);
@@ -45,6 +50,7 @@ public final class SubscriptionToken {
 	 *
 	 * @return a value indicating if the subscription is active
 	 */
+    @Override
     public boolean isSubscribed() {
         return isSubscribed.get();
     }

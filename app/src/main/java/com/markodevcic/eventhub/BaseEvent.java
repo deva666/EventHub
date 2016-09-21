@@ -16,5 +16,8 @@ limitations under the License.
 
 package com.markodevcic.eventhub;
 
+/***
+ * Base class for all event types
+ */
 public abstract class BaseEvent {
 }

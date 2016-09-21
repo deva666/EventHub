@@ -16,6 +16,10 @@ limitations under the License.
 
 package com.markodevcic.eventhub;
 
+/***
+ * Action to invoke on event publication
+ * @param <T> subclass of {@link BaseEvent}
+ */
 public interface OnEvent<T extends BaseEvent> {
     void invoke(T event);
 }
