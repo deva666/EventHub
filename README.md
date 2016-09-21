@@ -9,9 +9,9 @@
 ---------------
 ### Examples: ###
 
-<br></br>
+
 *Subscribe with weak subscription, internally EventHub stores a weak reference to the subscriber.*
-<br/>
+
 
 ```java
 EventHub eventHub = new EventHub();
@@ -37,6 +37,15 @@ eventHub.publish(new SomeEvent());
 ```java
 EventHub eventHub = new EventHub();
 eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published"), PublicationMode.MAIN_THREAD);
+eventHub.publish(new SomeEvent());
+```
+
+*Have some custom rule whether the subscription can be invoked? Pass it to subscribe method.*
+
+
+```java
+EventHub eventHub = new EventHub();
+eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "this won't be called"), () -> false);
 eventHub.publish(new SomeEvent());
 ```
 
