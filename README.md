@@ -9,7 +9,7 @@
 ---------------
 ### Examples: ###
 
-<br/>
+<br></br>
 *Subscribe with weak subscription, internally EventHub stores a weak reference to the subscriber.*
 <br/>
 
