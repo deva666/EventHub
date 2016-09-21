@@ -9,9 +9,9 @@
 ---------------
 ### Examples: ###
 
-
+<br/>
 *Subscribe with weak subscription, internally EventHub stores a weak reference to the subscriber.*
-
+<br/>
 
 ```java
 EventHub eventHub = new EventHub();
