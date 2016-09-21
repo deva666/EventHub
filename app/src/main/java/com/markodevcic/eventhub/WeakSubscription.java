@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 
 	WeakSubscription(OnEvent<? extends BaseEvent> onEvent, PublicationMode publicationMode, Predicate predicate) {
 		super(publicationMode, predicate);
-		eventWeakReference = new WeakReference<OnEvent<? extends BaseEvent>>(onEvent);
+		eventWeakReference = new WeakReference<>(onEvent);
 	}
 
 	@Nullable
