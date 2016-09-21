@@ -34,9 +34,6 @@ public final class SubscriptionToken
         this.onUnSubscribe = onUnSubscribe;
     }
 
-	/***
-     * Stops listening for events
-     */
     @Override
     public void unSubscribe() {
         if (isSubscribed.compareAndSet(true, false)) {
@@ -45,11 +42,6 @@ public final class SubscriptionToken
         }
     }
 
-
-	/***
-	 *
-	 * @return a value indicating if the subscription is active
-	 */
     @Override
     public boolean isSubscribed() {
         return isSubscribed.get();

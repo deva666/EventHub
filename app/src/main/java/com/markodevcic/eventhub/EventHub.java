@@ -30,19 +30,20 @@ public final class EventHub {
 
 	private PublicationMode defaultPublicationMode = PublicationMode.MAIN_THREAD;
 
-	public EventHub() {}
+	public EventHub() {
+	}
 
 	public EventHub(PublicationMode publicationMode) {
 		defaultPublicationMode = publicationMode;
 	}
 
 
-
 	/***
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription holds a weak reference to onEvent action, allowing it to be garbage collected.
+	 *
 	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
+	 * @param onEvent    action to be invoked on event publish
 	 */
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass, OnEvent<T> onEvent) {
 
@@ -53,8 +54,9 @@ public final class EventHub {
 	/***
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription holds a weak reference to onEvent action, allowing it to be garbage collected.
-	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
+	 *
+	 * @param eventClass      type of event to listen for publications
+	 * @param onEvent         action to be invoked on event publish
 	 * @param publicationMode where to schedule the event publish
 	 */
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
@@ -68,9 +70,10 @@ public final class EventHub {
 	/***
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription holds a weak reference to onEvent action, allowing it to be garbage collected.
+	 *
 	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
-	 * @param predicate predicate that will be invoked to check if the event can be published for this subscription
+	 * @param onEvent    action to be invoked on event publish
+	 * @param predicate  predicate that will be invoked to check if the event can be published for this subscription
 	 */
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
 												OnEvent<T> onEvent,
@@ -83,10 +86,11 @@ public final class EventHub {
 	/***
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription holds a weak reference to onEvent action, allowing it to be garbage collected.
-	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
+	 *
+	 * @param eventClass      type of event to listen for publications
+	 * @param onEvent         action to be invoked on event publish
 	 * @param publicationMode where to schedule the event publish
-	 * @param predicate predicate that will be invoked to check if the event can be published for this subscription
+	 * @param predicate       predicate that will be invoked to check if the event can be published for this subscription
 	 */
 	public <T extends BaseEvent> void subscribe(Class<T> eventClass,
 												OnEvent<T> onEvent,
@@ -121,8 +125,9 @@ public final class EventHub {
 	 * When default constructor is used then uses {@code PublicationMode.MAIN_THREAD}.
 	 * Subscription will hold a strong reference to onEvent action.
 	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
+	 *
 	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
+	 * @param onEvent    action to be invoked on event publish
 	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
 	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass, OnEvent<T> onEvent) {
@@ -134,14 +139,15 @@ public final class EventHub {
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription will hold a strong reference to onEvent action.
 	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
-	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
+	 *
+	 * @param eventClass      type of event to listen for publications
+	 * @param onEvent         action to be invoked on event publish
 	 * @param publicationMode where to schedule the event publish
 	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
 	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass,
-																	 OnEvent<T> onEvent,
-																	 PublicationMode publicationMode) {
+														 OnEvent<T> onEvent,
+														 PublicationMode publicationMode) {
 
 		return subscribeForToken(eventClass, onEvent, publicationMode, null);
 	}
@@ -151,14 +157,15 @@ public final class EventHub {
 	 * Subscribes the onEven action to an event that will be published.
 	 * Subscription will hold a strong reference to onEvent action.
 	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
+	 *
 	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
-	 * @param predicate predicate that will be invoked to check if the event can be published for this subscription
+	 * @param onEvent    action to be invoked on event publish
+	 * @param predicate  predicate that will be invoked to check if the event can be published for this subscription
 	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
 	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass,
-																	 OnEvent<T> onEvent,
-																	 Predicate predicate) {
+														 OnEvent<T> onEvent,
+														 Predicate predicate) {
 
 		return subscribeForToken(eventClass, onEvent, defaultPublicationMode, predicate);
 	}
@@ -170,16 +177,17 @@ public final class EventHub {
 	 * When default constructor is used then uses {@code PublicationMode.MAIN_THREAD}.
 	 * Subscription will hold a strong reference to onEvent action.
 	 * To avoid memory leaks, unSubscribe method must be called on the {@link Token} when subscriber is done.
-	 * @param eventClass type of event to listen for publications
-	 * @param onEvent action to be invoked on event publish
+	 *
+	 * @param eventClass      type of event to listen for publications
+	 * @param onEvent         action to be invoked on event publish
 	 * @param publicationMode where to schedule the event publish
-	 * @param predicate predicate that will be invoked to check if the event can be published for this subscription
+	 * @param predicate       predicate that will be invoked to check if the event can be published for this subscription
 	 * @return {@link Token} which can be used to un-subscribe from notifications
 	 */
 	public <T extends BaseEvent> Token subscribeForToken(Class<T> eventClass,
-																	 OnEvent<T> onEvent,
-																	 PublicationMode publicationMode,
-																	 @Nullable Predicate predicate) {
+														 OnEvent<T> onEvent,
+														 PublicationMode publicationMode,
+														 @Nullable Predicate predicate) {
 		Ensure.notNull(eventClass, "eventClass");
 		Ensure.notNull(onEvent, "onEvent");
 		Ensure.notNull(publicationMode, "publicationMode");
@@ -202,6 +210,7 @@ public final class EventHub {
 
 	/***
 	 * Publishes the event to all subscribers
+	 *
 	 * @param event payload to be published
 	 * @return value indicating if any subscribers got notified
 	 */
