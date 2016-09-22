@@ -18,6 +18,7 @@ package com.markodevcic.eventhub;
 
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +27,7 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public final class EventHub {
 
-	private final Map<Class<? extends BaseEvent>, Map<String, Subscription>> classToSubsMap = new HashMap<>();
+	private final Map<Class<? extends BaseEvent>, Map<String, Subscription>> classToSubsMap = new ArrayMap<>();
 
 	private PublicationMode defaultPublicationMode = PublicationMode.MAIN_THREAD;
 
@@ -111,7 +112,7 @@ public final class EventHub {
 				Map<String, Subscription> subscriptionMap = classToSubsMap.get(eventClass);
 				subscriptionMap.put(subscription.id, subscription);
 			} else {
-				Map<String, Subscription> subscriptionMap = new HashMap<>();
+				Map<String, Subscription> subscriptionMap = new ArrayMap<>();
 				subscriptionMap.put(subscription.id, subscription);
 				classToSubsMap.put(eventClass, subscriptionMap);
 			}
