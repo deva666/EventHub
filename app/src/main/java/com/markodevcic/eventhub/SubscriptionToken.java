@@ -18,7 +18,7 @@ package com.markodevcic.eventhub;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class SubscriptionToken
+/*package*/ final class SubscriptionToken
         implements Token {
 
     private final Class<? extends BaseEvent> eventClass;
