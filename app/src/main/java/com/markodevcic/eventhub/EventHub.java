@@ -203,7 +203,7 @@ public final class EventHub {
 			synchronized (classToSubsMap) {
 				Map<String, Subscription> subscriptionMap = classToSubsMap.get(subscriptionToken.eventClass);
 				if (subscriptionMap != null && subscriptionMap.containsKey(subscriptionToken.holderId)) {
-					subscriptionMap.remove(subscriptionToken.holderId;
+					subscriptionMap.remove(subscriptionToken.holderId);
 				}
 			}
 		};
