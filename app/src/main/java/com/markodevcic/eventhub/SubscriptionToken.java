@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /*package*/ final class SubscriptionToken
         implements Token {
 
-    private final Class<? extends BaseEvent> eventClass;
-    private final String holderId;
+	/*package*/ final Class<? extends BaseEvent> eventClass;
+	/*package*/ final String holderId;
     private Action1<SubscriptionToken> onUnSubscribe;
     private final AtomicBoolean isSubscribed = new AtomicBoolean(true);
 
@@ -45,13 +45,5 @@ import java.util.concurrent.atomic.AtomicBoolean;
     @Override
     public boolean isSubscribed() {
         return isSubscribed.get();
-    }
-
-    /*package*/ Class<? extends BaseEvent> getEventClass() {
-        return eventClass;
-    }
-
-    /*package*/ String getHolderId() {
-        return holderId;
     }
 }

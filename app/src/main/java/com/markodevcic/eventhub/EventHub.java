@@ -201,9 +201,9 @@ public final class EventHub {
 	private Action1<SubscriptionToken> getTokenUnSubscribeAction() {
 		return subscriptionToken -> {
 			synchronized (classToSubsMap) {
-				Map<String, Subscription> subscriptionMap = classToSubsMap.get(subscriptionToken.getEventClass());
-				if (subscriptionMap != null && subscriptionMap.containsKey(subscriptionToken.getHolderId())) {
-					subscriptionMap.remove(subscriptionToken.getHolderId());
+				Map<String, Subscription> subscriptionMap = classToSubsMap.get(subscriptionToken.eventClass);
+				if (subscriptionMap != null && subscriptionMap.containsKey(subscriptionToken.holderId)) {
+					subscriptionMap.remove(subscriptionToken.holderId;
 				}
 			}
 		};
