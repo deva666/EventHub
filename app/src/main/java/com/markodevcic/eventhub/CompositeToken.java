@@ -9,7 +9,8 @@ import java.util.List;
 public final class CompositeToken
 		implements Token {
 
-	private List<Token> tokens = new ArrayList<>();
+	private final List<Token> tokens = new ArrayList<>();
+	private volatile boolean isSubscribed = true;
 
 	/**
 	 * Adds a new {@link Token} to this {@code CompositeToken}
@@ -52,6 +53,8 @@ public final class CompositeToken
 		for (Token token : tokens) {
 			token.unSubscribe();
 		}
+		tokens.clear();
+		isSubscribed = false;
 	}
 
 	/**
@@ -60,11 +63,10 @@ public final class CompositeToken
 	 */
 	@Override
 	public boolean isSubscribed() {
-		for (Token token : tokens) {
-			if (token.isSubscribed()) {
-				return true;
-			}
-		}
-		return false;
+		return isSubscribed;
+	}
+
+	public boolean hasSubscriptions() {
+		return isSubscribed && !tokens.isEmpty();
 	}
 }
