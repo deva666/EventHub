@@ -24,4 +24,10 @@ package com.markodevcic.eventhub;
             throw new IllegalArgumentException("argument: " + argumentName + " can't be null");
         }
     }
+
+	/*package*/ static void condition(boolean check, String message) {
+		if (!check) {
+			throw new IllegalStateException(message);
+		}
+	}
 }

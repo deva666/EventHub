@@ -38,4 +38,10 @@ public class CompositeTokenTests {
 		eventHub.publish(new SomeEvent());
 		Assert.assertTrue(subscriptionCalled.get());
 	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testAddSelf() {
+		CompositeToken token = new CompositeToken();
+		token.add(token);
+	}
 }

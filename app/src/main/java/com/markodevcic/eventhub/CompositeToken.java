@@ -3,12 +3,16 @@ package com.markodevcic.eventhub;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Multiple {@link Token} holder, unSubscribe releases all tokens
+ */
 public final class CompositeToken
 		implements Token {
 
 	private final List<Token> tokens = new ArrayList<>();
 
 	public void add(Token token) {
+		Ensure.condition(token != this, "can't add self to token list");
 		if (!tokens.contains(token)) {
 			tokens.add(token);
 		}
