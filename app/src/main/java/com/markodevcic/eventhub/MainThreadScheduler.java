@@ -5,11 +5,13 @@ import android.os.Looper;
 
 /*package*/ final class MainThreadScheduler {
 
-	private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+	private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
-	private MainThreadScheduler() {}
+	private MainThreadScheduler() {
+		throw new IllegalStateException("no instances");
+	}
 
 	/*package*/ static void schedule(Runnable runnable) {
-		mainHandler.post(runnable);
+		MAIN_HANDLER.post(runnable);
 	}
 }
