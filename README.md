@@ -36,7 +36,7 @@ eventHub.publish(new SomeEvent());
 
 ```java
 EventHub eventHub = new EventHub();
-eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published"), PublicationMode.MAIN_THREAD);
+eventHub.subscribe(SomeEvent.class, event -> Log.d("event", "some event published on main thread"), PublicationMode.MAIN_THREAD);
 eventHub.publish(new SomeEvent());
 ```
 ---------------
