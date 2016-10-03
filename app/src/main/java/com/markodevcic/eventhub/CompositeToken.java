@@ -4,20 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Multiple {@link Token} holder, unSubscribe releases all tokens
+ * Acts as a group of {@link Token} which can be unsubscribed together
  */
 public final class CompositeToken
 		implements Token {
 
-	private final List<Token> tokens = new ArrayList<>();
+	private List<Token> tokens = new ArrayList<>();
 
+	/**
+	 * Adds a new {@link Token} to this {@code CompositeToken}
+	 * @param token
+	 */
 	public void add(Token token) {
 		Ensure.condition(token != this, "can't add self to token list");
+		if (!token.isSubscribed()) {
+			return;
+		}
 		if (!tokens.contains(token)) {
 			tokens.add(token);
 		}
 	}
 
+	/**
+	 * Removes a {@link Token} from this {@code CompositeToken} and unsubscribes it.
+	 * @param token
+	 */
 	public void remove(Token token) {
 		int position = -1;
 		int size = tokens.size();
@@ -28,10 +39,14 @@ public final class CompositeToken
 			}
 		}
 		if (position >= 0) {
+			token.unSubscribe();
 			tokens.remove(position);
 		}
 	}
 
+	/**
+	 * Unsubscribes all tokens
+	 */
 	@Override
 	public void unSubscribe() {
 		for (Token token : tokens) {
@@ -39,6 +54,10 @@ public final class CompositeToken
 		}
 	}
 
+	/**
+	 * Returns true if has subscriptions
+	 * @return
+	 */
 	@Override
 	public boolean isSubscribed() {
 		for (Token token : tokens) {
