@@ -9,7 +9,7 @@ import android.os.Looper;
 
 	private MainThreadScheduler() {}
 
-	static void schedule(Runnable runnable) {
+	/*package*/ static void schedule(Runnable runnable) {
 		mainHandler.post(runnable);
 	}
 }

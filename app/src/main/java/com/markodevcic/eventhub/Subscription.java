@@ -7,11 +7,11 @@ import java.util.UUID;
 
 /*package*/ abstract class Subscription {
 
-	final String id;
-	final PublicationMode publicationMode;
+	/*package*/ final String id;
+	/*package*/ final PublicationMode publicationMode;
 	private final WeakReference<Predicate> predicateReference;
 
-	Subscription(PublicationMode publicationMode, @Nullable Predicate predicate) {
+	/*package*/ Subscription(PublicationMode publicationMode, @Nullable Predicate predicate) {
 		this.id = UUID.randomUUID().toString();
 		this.publicationMode = publicationMode;
 		this.predicateReference = new WeakReference<>(predicate);

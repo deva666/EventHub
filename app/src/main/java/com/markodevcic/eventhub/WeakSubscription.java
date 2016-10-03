@@ -8,7 +8,9 @@ import java.lang.ref.WeakReference;
 
 	private final WeakReference<OnEvent<? extends BaseEvent>> eventWeakReference;
 
-	WeakSubscription(OnEvent<? extends BaseEvent> onEvent, PublicationMode publicationMode, Predicate predicate) {
+	/*package*/ WeakSubscription(OnEvent<? extends BaseEvent> onEvent,
+								 PublicationMode publicationMode,
+								 Predicate predicate) {
 		super(publicationMode, predicate);
 		eventWeakReference = new WeakReference<>(onEvent);
 	}

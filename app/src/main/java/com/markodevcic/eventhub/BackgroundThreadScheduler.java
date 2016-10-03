@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 	private BackgroundThreadScheduler() {}
 
-	static void schedule(Runnable runnable) {
+	/*package*/ static void schedule(Runnable runnable) {
 		executor.execute(runnable);
 
 	}
