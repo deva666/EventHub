@@ -5,43 +5,44 @@ import java.util.List;
 
 /**
  * Acts as a group of {@link Token} which can be unsubscribed together
+ * Class is thread safe
  */
 public final class CompositeToken
 		implements Token {
 
-	private final List<Token> tokens = new ArrayList<>();
+	private final Object lock = new Object();
+	private List<Token> tokens = new ArrayList<>();
 	private volatile boolean isSubscribed = true;
 
 	/**
-	 * Adds a new {@link Token} to this {@code CompositeToken}
+	 * Adds a new {@link Token} to this {@code CompositeToken} if the {@link Token} is subscribed
+	 *
 	 * @param token
 	 */
 	public void add(Token token) {
 		Ensure.condition(token != this, "can't add self to token list");
-		if (!token.isSubscribed()) {
+		if (!isSubscribed || !token.isSubscribed()) {
 			return;
 		}
-		if (!tokens.contains(token)) {
-			tokens.add(token);
+		synchronized (lock) {
+			if (!tokens.contains(token)) {
+				tokens.add(token);
+			}
 		}
 	}
 
 	/**
 	 * Removes a {@link Token} from this {@code CompositeToken} and unsubscribes it.
+	 *
 	 * @param token
 	 */
 	public void remove(Token token) {
-		int position = -1;
-		int size = tokens.size();
-		for (int i = 0; i < size; i++) {
-			if (tokens.get(i).equals(token)) {
-				position = i;
-				break;
-			}
+		boolean removed;
+		synchronized (lock) {
+			removed = tokens.remove(token);
 		}
-		if (position >= 0) {
+		if (removed) {
 			token.unSubscribe();
-			tokens.remove(position);
 		}
 	}
 
@@ -50,15 +51,20 @@ public final class CompositeToken
 	 */
 	@Override
 	public void unSubscribe() {
-		for (Token token : tokens) {
+		isSubscribed = false;
+		Iterable<Token> tokensCopy;
+		synchronized (lock) {
+			tokensCopy = tokens;
+			tokens = null;
+		}
+		for (Token token : tokensCopy) {
 			token.unSubscribe();
 		}
-		tokens.clear();
-		isSubscribed = false;
 	}
 
 	/**
 	 * Returns true if has subscriptions
+	 *
 	 * @return
 	 */
 	@Override
@@ -67,6 +73,6 @@ public final class CompositeToken
 	}
 
 	public boolean hasSubscriptions() {
-		return isSubscribed && !tokens.isEmpty();
+		return isSubscribed && tokens != null && !tokens.isEmpty();
 	}
 }
