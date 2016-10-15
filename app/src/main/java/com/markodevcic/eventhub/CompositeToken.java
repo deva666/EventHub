@@ -5,14 +5,13 @@ import java.util.List;
 
 /**
  * Acts as a group of {@link Token} which can be unsubscribed together
- * Class is thread safe
+ * Class is NOT thread safe
  */
 public final class CompositeToken
-		implements Token {
+		extends Token {
 
-	private final Object lock = new Object();
 	private List<Token> tokens = new ArrayList<>();
-	private volatile boolean isSubscribed = true;
+	private boolean isSubscribed = true;
 
 	/**
 	 * Adds a new {@link Token} to this {@code CompositeToken} if the {@link Token} is subscribed
@@ -24,10 +23,8 @@ public final class CompositeToken
 		if (!isSubscribed || !token.isSubscribed()) {
 			return;
 		}
-		synchronized (lock) {
-			if (!tokens.contains(token)) {
-				tokens.add(token);
-			}
+		if (!tokens.contains(token)) {
+			tokens.add(token);
 		}
 	}
 
@@ -38,9 +35,7 @@ public final class CompositeToken
 	 */
 	public void remove(Token token) {
 		boolean removed;
-		synchronized (lock) {
-			removed = tokens.remove(token);
-		}
+		removed = tokens.remove(token);
 		if (removed) {
 			token.unSubscribe();
 		}
@@ -53,10 +48,8 @@ public final class CompositeToken
 	public void unSubscribe() {
 		isSubscribed = false;
 		Iterable<Token> tokensCopy;
-		synchronized (lock) {
-			tokensCopy = tokens;
-			tokens = null;
-		}
+		tokensCopy = tokens;
+		tokens = null;
 		for (Token token : tokensCopy) {
 			token.unSubscribe();
 		}
