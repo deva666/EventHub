@@ -51,6 +51,14 @@ eventHub.publish(new SomeEvent());
 
 
 ------------
+*In Kotlin you can specify the event type as generic parameter of subscribe method.*
+```
+val eventHub = EventHub()
+eventHub.subscribe<SomeEvent> { e -> Log.d("event", "some event called") }
+eventHub.publish(SomeEvent())
+```
+
+--------------
 
 Written by [Marko Devcic](http://www.markodevcic.com)
 
