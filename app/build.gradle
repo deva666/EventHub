@@ -1,20 +1,21 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -43,4 +44,11 @@ dependencies {
 }
 repositories {
     mavenCentral()
+}
+
+retrolambda {
+    javaVersion JavaVersion.VERSION_1_6
+    jvmArgs '-arg1', '-arg2'
+    defaultMethods false
+    incremental true
 }
