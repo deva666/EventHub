@@ -2,11 +2,10 @@
 
 # EventHub #
 
-## Publisher/Subscriber library for Android ##
+## Android Publisher/Subscriber library for lazy people who don't want to worry about manual unsubscription and memory leaks ##
 
-* simple - not bloated with features
-* fast - no reflection
-* no need to unsubscribe (no memory leaks)
+* no reflection
+* no need to unsubscribe manually (forget about memory leaks)
 
 ---------------
 ### Examples: ###
